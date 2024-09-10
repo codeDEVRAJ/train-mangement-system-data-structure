@@ -1,0 +1,176 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct stack
+{
+    int size;
+    int top;
+    char **arr; // Array of strings
+};
+
+int isFull(struct stack *ptr)
+{
+    if (ptr->top == ptr->size - 1)
+    {
+        printf("TRAIN IS FULL\n");
+        return -1;
+    }
+    return 0;
+}
+
+int isEmpty(struct stack *ptr)
+{
+    if (ptr->top == -1)
+    {
+        printf("TRAIN IS EMPTY\n");
+        return 1;
+    }
+    return 0;
+}
+
+void push(struct stack *ptr, char *val)
+{
+    if (isFull(ptr))
+    {
+        printf("TRAIN IS ALREADY FULL, CANNOT ADD MORE PASSENGERS\n");
+    }
+    else
+    {
+        ptr->top++;
+        ptr->arr[ptr->top] = (char *)malloc((strlen(val) + 1) * sizeof(char)); // Allocate memory for the string
+        strcpy(ptr->arr[ptr->top], val); // Copy the passenger name
+        printf("\n PASSENGER %s HAS BEEN ADDED\n", val);
+    }
+}
+
+char *pop(struct stack *ptr)
+{
+    if (isEmpty(ptr))
+    {
+        printf("TRAIN IS EMPTY, YOU CAN BOOK A TICKET NOW\n");
+        return NULL;
+    }
+    else
+    {
+        char *val = ptr->arr[ptr->top];
+        ptr->top--;
+        return val;
+    }
+}
+
+char *peek(struct stack *sp, int i)
+{
+    int arrIndex = sp->top - i + 1;
+    if (arrIndex < 0 || arrIndex > sp->top)
+    {
+        printf("INVALID POSITION\n");
+        return NULL;
+    }
+    else
+    {
+        return sp->arr[arrIndex];
+    }
+}
+
+void display(struct stack *sp)
+{
+    if (isEmpty(sp))
+    {
+        printf("TRAIN IS EMPTY, NO ONE IS IN THE TRAIN\n");
+    }
+    else
+    {
+        printf("PASSENGERS ARE:\n");
+        for (int i = 0; i <= sp->top; i++)
+        {
+            printf("%s ", sp->arr[i]);
+        }
+        printf("\n");
+    }
+}
+
+int main()
+{
+    struct stack *sp = (struct stack *)malloc(sizeof(struct stack));
+    sp->size = 10;
+    sp->top = -1;
+    sp->arr = (char **)malloc(sp->size * sizeof(char *)); // Allocate memory for an array of strings
+    char h[50];
+    int option;
+
+    do
+    {
+        printf("\n1. Check if train is full\n");
+        printf("2. Check if train is empty\n");
+        printf("3. Book a ticket\n");
+        printf("4. Remove a passenger\n");
+        printf("5. Last stop of this train\n");
+        printf("6. Display list of train members\n");
+        printf("7. Exit\n");
+        printf("Enter your option: ");
+        scanf("%d", &option);
+        getchar(); // Clear the buffer to handle newline
+
+        switch (option)
+        {
+        case 1:
+            isFull(sp);
+            break;
+        case 2:
+            isEmpty(sp);
+            break;
+        case 3:
+            if (!isFull(sp))
+            {
+                printf("ENTER THE NAME OF THE PASSENGER: \n");
+                fgets(h, 50, stdin);
+                h[strcspn(h, "\n")] = 0; // Remove newline character from the input
+                push(sp, h);
+            }
+            break;
+        case 4:
+        {
+            char *passenger = pop(sp);
+            if (passenger != NULL)
+            {
+                printf("PASSENGER %s IS LEAVING THE TRAIN\n", passenger);
+                free(passenger); // Free the memory allocated for the passenger name
+            }
+            break;
+        }
+        case 5:
+        {
+            printf("Enter the position from the top (1 for last stop): ");
+            int pos;
+            scanf("%d", &pos);
+            getchar(); // Clear the buffer to handle newline
+            char *passenger = peek(sp, pos);
+            if (passenger != NULL)
+            {
+                printf("Passenger at position %d: %s\n", pos, passenger);
+            }
+            break;
+        }
+        case 6:
+            display(sp);
+            break;
+        case 7:
+            printf("Jai Hind! Dhanyawad, Thank you!\n");
+            break;
+        default:
+            printf("Error: Please enter a valid option.\n");
+            break;
+        }
+    } while (option != 7);
+
+    // Free allocated memory
+    for (int i = 0; i <= sp->top; i++)
+    {
+        free(sp->arr[i]);
+    }
+    free(sp->arr);
+    free(sp);
+
+    return 0;
+}
